@@ -3,6 +3,7 @@ import {DiaryStateContext} from "../App.jsx";
 import {useNavigate} from "react-router-dom";
 
 const useDiary = (id) => {
+	console.log(id);
 	const nav = useNavigate();
 	const data = useContext(DiaryStateContext);
 	const [curDiaryItem, setCurDiaryItem] = useState();

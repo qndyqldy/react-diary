@@ -5,7 +5,7 @@ import New from '@/pages/New.jsx';
 import Edit from '@/pages/Edit.jsx';
 import Diary from '@/pages/Diary.jsx';
 import NotFound from '@/pages/NotFound.jsx';
-import {useReducer, useRef, useState} from 'react';
+import {createContext, useMemo, useReducer, useRef, useState} from 'react';
 
 const reducer = (state, action) => {
   let nextState;
@@ -30,6 +30,8 @@ const reducer = (state, action) => {
 
   return nextState;
 }
+export const DiaryStateContext = createContext();
+export const DiaryDispatchContext = createContext();
 function App() {
   const [diaryList, dispatch] = useReducer(reducer, []);
   const idRef = useRef(0);
@@ -61,15 +63,25 @@ function App() {
     })
   }
 
+  const memorizedDispatch = useMemo(() => {
+    return {
+      onAdd, onUpdate, onDelete
+    }
+  }, [])
+
   return (
     <>
-      <Routes>
-        <Route path={"/"} element={<Home list={diaryList} onDelete={onDelete}/>}></Route>
-        <Route path={"/new"} element={<New onSubmit={onAdd} />}></Route>
-        <Route path={"/edit/:id"} element={<Edit getDiary={getDiary} onSubmit={onUpdate} onDelete={onDelete}/>}></Route>
-        <Route path={"/diary/:id"} element={<Diary getDiary={getDiary}/>}></Route>
-        <Route path={"*"} element={<NotFound />}></Route>
-      </Routes>
+      <DiaryStateContext.Provider value={diaryList}>
+        <DiaryDispatchContext.Provider value={memorizedDispatch}>
+          <Routes>
+            <Route path={"/"} element={<Home />}></Route>
+            <Route path={"/new"} element={<New />}></Route>
+            <Route path={"/edit/:id"} element={<Edit />}></Route>
+            <Route path={"/diary/:id"} element={<Diary />}></Route>
+            <Route path={"*"} element={<NotFound />}></Route>
+          </Routes>
+        </DiaryDispatchContext.Provider>
+      </DiaryStateContext.Provider>
     </>
   )
 }

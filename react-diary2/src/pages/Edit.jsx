@@ -2,27 +2,23 @@ import Header from '@/components/Header.jsx';
 import Editor from '@/components/Editor.jsx';
 import Button from '@/components/Button.jsx';
 import {useNavigate, useParams} from 'react-router';
-import {useEffect} from 'react';
 import usePageTitle from '@/hooks/usePageTitle.js';
+import useDiary from '@/hooks/useDiary.js';
+import {useContext} from 'react';
+import {DiaryDispatchContext} from '@/App.jsx';
 
-const Edit = ({getDiary, onSubmit, onDelete}) => {
+const Edit = () => {
 	const nav = useNavigate();
 	const params = useParams();
-	const diary = getDiary(params.id);
+	const diary = useDiary(params.id);
+	const {onDelete, onUpdate} = useContext(DiaryDispatchContext);
 
-	useEffect(() => {
-		if(!diary) {
-			alert('잘못된 요청입니다.');
-			nav('/');
-		}
-	}, [diary]);
+	usePageTitle(`${params.id}번 일기 수정`);
 
 	const onClickDelete = () => {
 		onDelete(diary.id);
 		nav('/', {replace: true});
 	}
-	
-	usePageTitle(`${diary.id}번 일기 수정`)
 
 	return (
 		<div>
@@ -30,8 +26,7 @@ const Edit = ({getDiary, onSubmit, onDelete}) => {
 				leftChild={<Button text={"< 뒤로 가기"} onClick={() => nav(-1)} />}
 				rightChild={<Button text={"삭제하기"} type={"NEGATIVE"} onClick={onClickDelete} />}>
 			</Header>
-			<Editor initData={diary} onSubmit={onSubmit}>
-				
+			<Editor initData={diary} onSubmit={onUpdate}>
 			</Editor>
 		</div>
 	)

@@ -1,21 +1,18 @@
 import Header from '@/components/Header.jsx';
 import {useNavigate, useParams} from 'react-router';
-import {useEffect} from 'react';
 import {getStringedDate} from '@/utils/date.js';
 import Button from '@/components/Button.jsx';
 import Viewer from '@/components/Viewer.jsx';
+import useDiary from '@/hooks/useDiary.js';
 
-const Diary = ({getDiary}) => {
+const Diary = () => {
 	const nav = useNavigate();
 	const params = useParams();
-	const diary = getDiary(params.id);
+	const diary = useDiary(params.id);
 
-	useEffect(() => {
-		if(!diary) {
-			alert('잘못된 요청입니다.');
-			nav('/');
-		}
-	}, [diary]);
+	if(!diary) {
+		return <div>로딩중</div>;
+	}
 
 	return (
 		<div>
