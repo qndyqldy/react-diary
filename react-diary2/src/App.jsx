@@ -5,35 +5,60 @@ import New from '@/pages/New.jsx';
 import Edit from '@/pages/Edit.jsx';
 import Diary from '@/pages/Diary.jsx';
 import NotFound from '@/pages/NotFound.jsx';
-import {useRef, useState} from 'react';
+import {useReducer, useRef, useState} from 'react';
 
+const reducer = (state, action) => {
+  let nextState;
+
+  switch (action.type) {
+    case 'INIT':
+      return action.data;
+    case 'CREATE':
+      nextState = [...state, action.data];
+      break;
+    case 'UPDATE':
+      nextState = state.map(item => String(item.id) === String(action.data.id) ? action.data : item);
+      break;
+    case 'DELETE':
+      nextState = state.filter(item => String(item.id) !== String(action.targetId));
+      break;
+    default:
+      nextState = state;
+      break;
+  }
+  localStorage.setItem('diary', JSON.stringify(nextState));
+
+  return nextState;
+}
 function App() {
-  const [diaryList, setDiaryList] = useState([]);
+  const [diaryList, dispatch] = useReducer(reducer, []);
   const idRef = useRef(0);
 
   const getDiary = (id) => {
     return diaryList.find(item => String(item.id) === String(id));
   }
   const onAdd = (diary) => {
-    setDiaryList([
-      ...diaryList,
-      {
+    dispatch({
+      type: 'CREATE',
+      data: {
         id: idRef.current++,
         ...diary
       }
-    ])
+    });
   }
 
-  const onDelete = (id) => {
-    setDiaryList(
-      diaryList.filter(diary => diary.id !== id)
-    );
+  const onDelete = (targetId) => {
+    dispatch({
+      type: 'DELETE',
+      targetId
+    })
   }
 
   const onUpdate = (diary) => {
-    setDiaryList(
-      diaryList.map(item => diary.id === item.id ? diary : item)
-    )
+    dispatch({
+      type: 'UPDATE',
+      data: {...diary}
+    })
   }
 
   return (
