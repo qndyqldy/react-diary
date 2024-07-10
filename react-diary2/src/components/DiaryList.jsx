@@ -1,13 +1,11 @@
 import './DiaryList.css'
 import Button from '@/components/Button.jsx';
-import {useContext, useState} from 'react';
+import {useEffect, useState} from 'react';
 import DiaryItem from '@/components/DiaryItem.jsx';
 import {useNavigate} from 'react-router';
-import {DiaryDispatchContext} from '@/App.jsx';
 
 const DiaryList = ({list}) => {
 	const nav = useNavigate();
-	const {onDelete} = useContext(DiaryDispatchContext);
 
 	const [sortType, setSortType] = useState('latest');
 	const onChangeSortType = (e) => {
@@ -15,17 +13,20 @@ const DiaryList = ({list}) => {
 	}
 
 	const getSortedList = () => {
-		console.log(list);
 		return list.toSorted((a, b)=> {
 			if(sortType === 'latest') {
-				return Number(b.createdDate) - Number(a.createdDate);
+				return new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime();
 			} else {
-				return Number(a.createdDate) - Number(b.createdDate);
+				return new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime();
 			}
 		});
 	}
 
-	const sortedData = getSortedList();
+	let [sortedData, setSortedData] = useState([]);
+	useEffect(() => {
+		setSortedData(getSortedList());
+	}, [list, sortType]);
+
 	// const sortedData = [];
 
 	return (
@@ -43,7 +44,7 @@ const DiaryList = ({list}) => {
 			<div className={"list_wrapper"}>
 				{
 					sortedData.map(diary => {
-						return <DiaryItem key={diary.id} {...diary} onDelete={onDelete}/>
+						return <DiaryItem key={diary.id} {...diary}/>
 					})
 				}
 			</div>

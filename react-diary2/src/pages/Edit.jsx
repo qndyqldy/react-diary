@@ -4,19 +4,19 @@ import Button from '@/components/Button.jsx';
 import {useNavigate, useParams} from 'react-router';
 import usePageTitle from '@/hooks/usePageTitle.js';
 import useDiary from '@/hooks/useDiary.js';
-import {useContext} from 'react';
-import {DiaryDispatchContext} from '@/App.jsx';
+import {useDiaryStore} from '@/stores/useDiaryStore.js';
 
 const Edit = () => {
 	const nav = useNavigate();
 	const params = useParams();
 	const diary = useDiary(params.id);
-	const {onDelete, onUpdate} = useContext(DiaryDispatchContext);
+	const removeDiary = useDiaryStore((state) => state.removeDiary);
+	const updateDiary = useDiaryStore((state) => state.updateDiary);
 
 	usePageTitle(`${params.id}번 일기 수정`);
 
-	const onClickDelete = () => {
-		onDelete(diary.id);
+	const onClickDelete = async () => {
+		await removeDiary(diary.id);
 		nav('/', {replace: true});
 	}
 
@@ -26,7 +26,7 @@ const Edit = () => {
 				leftChild={<Button text={"< 뒤로 가기"} onClick={() => nav(-1)} />}
 				rightChild={<Button text={"삭제하기"} type={"NEGATIVE"} onClick={onClickDelete} />}>
 			</Header>
-			<Editor initData={diary} onSubmit={onUpdate}>
+			<Editor initData={diary} onSubmit={updateDiary}>
 			</Editor>
 		</div>
 	)
