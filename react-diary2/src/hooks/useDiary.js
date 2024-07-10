@@ -1,15 +1,14 @@
-import {useContext, useEffect, useState} from "react";
-import {DiaryStateContext} from "../App.jsx";
+import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {useDiaryStore} from '@/stores/useDiaryStore.js';
 
 const useDiary = (id) => {
-	console.log(id);
+	const getDiary = useDiaryStore((state) => state.getDiary);
 	const nav = useNavigate();
-	const data = useContext(DiaryStateContext);
 	const [curDiaryItem, setCurDiaryItem] = useState();
 
 	useEffect(() => {
-		const currentDiaryItem = data.find(item => String(item.id) === String(id));
+		const currentDiaryItem = getDiary(id);
 
 		if(!currentDiaryItem) {
 			alert('존재하지 않는 일기장입니다.');
@@ -17,7 +16,7 @@ const useDiary = (id) => {
 		}
 
 		setCurDiaryItem(currentDiaryItem);
-	}, [id, data]);
+	}, [id, getDiary]);
 
 	return curDiaryItem;
 }

@@ -5,7 +5,15 @@ import New from '@/pages/New.jsx';
 import Edit from '@/pages/Edit.jsx';
 import Diary from '@/pages/Diary.jsx';
 import NotFound from '@/pages/NotFound.jsx';
-import {createContext, useMemo, useReducer, useRef, useState} from 'react';
+import {
+  createContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState
+} from 'react';
+import {useDiaryStore} from '@/stores/useDiaryStore.js';
 
 const reducer = (state, action) => {
   let nextState;
@@ -30,15 +38,12 @@ const reducer = (state, action) => {
 
   return nextState;
 }
-export const DiaryStateContext = createContext();
-export const DiaryDispatchContext = createContext();
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [diaryList, dispatch] = useReducer(reducer, []);
   const idRef = useRef(0);
 
-  const getDiary = (id) => {
-    return diaryList.find(item => String(item.id) === String(id));
-  }
+
   const onAdd = (diary) => {
     dispatch({
       type: 'CREATE',
@@ -69,19 +74,33 @@ function App() {
     }
   }, [])
 
+  const loadDiaryList = useDiaryStore((state) => state.loadList);
+
+  useEffect(() => {
+    const loadData = async () => {
+      console.log('mounted');
+      await loadDiaryList();
+      setIsLoading(false);
+    };
+
+    loadData();
+
+  }, [loadDiaryList]);
+
+  if(isLoading) {
+    return <div>데이터 로딩 중입니다..</div>
+  }
+
+
   return (
     <>
-      <DiaryStateContext.Provider value={diaryList}>
-        <DiaryDispatchContext.Provider value={memorizedDispatch}>
-          <Routes>
-            <Route path={"/"} element={<Home />}></Route>
-            <Route path={"/new"} element={<New />}></Route>
-            <Route path={"/edit/:id"} element={<Edit />}></Route>
-            <Route path={"/diary/:id"} element={<Diary />}></Route>
-            <Route path={"*"} element={<NotFound />}></Route>
-          </Routes>
-        </DiaryDispatchContext.Provider>
-      </DiaryStateContext.Provider>
+      <Routes>
+        <Route path={"/"} element={<Home />}></Route>
+        <Route path={"/new"} element={<New />}></Route>
+        <Route path={"/edit/:id"} element={<Edit />}></Route>
+        <Route path={"/diary/:id"} element={<Diary />}></Route>
+        <Route path={"*"} element={<NotFound />}></Route>
+      </Routes>
     </>
   )
 }

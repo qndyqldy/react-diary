@@ -37,8 +37,8 @@ const Editor = ({initData, onSubmit}) => {
 		});
 	}
 
-	const onClickSubmit = () => {
-		onSubmit({...input});
+	const onClickSubmit = async () => {
+		await onSubmit({...input});
 
 		nav('/', {replace: true});
 	}
