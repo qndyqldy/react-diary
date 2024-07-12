@@ -3,6 +3,8 @@ import axios from 'axios';
 export const loadDiaryList = async () => {
 	const { data } = await axios.get('/api/diaries');
 
+	console.log(data);
+
 	return data;
 }
 

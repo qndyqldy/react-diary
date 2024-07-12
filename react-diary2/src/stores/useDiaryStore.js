@@ -9,6 +9,7 @@ import {
 export const useDiaryStore = create((set, get) => ({
 	list: [],
 	loadList: async () => {
+		console.log('store load');
 		const data = await loadDiaryList();
 		set({
 			list: [...data]

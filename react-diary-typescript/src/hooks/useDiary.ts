@@ -1,13 +1,14 @@
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {useDiaryStore} from '@/stores/useDiaryStore.js';
+import {useDiaryStore} from '@/stores/useDiaryStore.ts';
+import {Diary} from "../types/diary.ts";
 
-const useDiary = (id) => {
+const useDiary = (id: number): Diary | undefined => {
 	const getDiary = useDiaryStore((state) => state.getDiary);
 	const nav = useNavigate();
-	const [curDiaryItem, setCurDiaryItem] = useState();
+	const [curDiaryItem, setCurDiaryItem] = useState<Diary | undefined>(undefined);
 
-	useEffect(() => {
+	useEffect((): void => {
 		const currentDiaryItem = getDiary(id);
 
 		if(!currentDiaryItem) {
